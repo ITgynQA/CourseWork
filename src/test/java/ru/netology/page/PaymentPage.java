@@ -11,69 +11,64 @@ import static com.codeborne.selenide.Selenide.$$;
 
 public class PaymentPage {
 
-    SelenideElement header = $$(".heading").get(2);
-    static ElementsCollection fieldToFill = $$(".input__control");
-    static SelenideElement cardNumberField = $$(".input__control").get(0);
-    static SelenideElement monthField = $$(".input__control").get(1);
-    static SelenideElement yearField = $$(".input__control").get(2);
-    static SelenideElement holderField = $$(".input__control").get(3);
-    static SelenideElement cvcField = $$(".input__control").get(4);
-    static SelenideElement continueButton = $$(".button__text").get(2);
-    static SelenideElement successMessage = $$(".notification__content").get(0);
-    static SelenideElement errorMessage = $$(".notification__content").get(1);
-    static ElementsCollection wrongFormatMessage = $$(".input__sub");
-    static ElementsCollection invalidField = $$(".input_invalid");
+    private final SelenideElement header = $$(".heading").get(2);
+    private final ElementsCollection fieldToFill = $$(".input__control");
+    private final SelenideElement cardNumberField = $$(".input__control").get(0);
+    private final SelenideElement monthField = $$(".input__control").get(1);
+    private final SelenideElement yearField = $$(".input__control").get(2);
+    private final SelenideElement holderField = $$(".input__control").get(3);
+    private final SelenideElement cvcField = $$(".input__control").get(4);
+    private final SelenideElement continueButton = $$(".button__text").get(2);
+    private final SelenideElement successMessage = $$(".notification__content").get(0);
+    private final SelenideElement errorMessage = $$(".notification__content").get(1);
+    private final ElementsCollection wrongFormatMessage = $$(".input__sub");
+    private final ElementsCollection invalidField = $$(".input_invalid");
 
     public PaymentPage() {
         header.shouldBe(visible);
     }
 
-    public static void successMessage() {
+    public void successMessage() {
         successMessage.shouldHave(text("Операция одобрена банком"),
                 Duration.ofSeconds(13)).shouldBe(visible);
     }
 
-    public static void errorMessage() {
+    public void errorMessage() {
         errorMessage.shouldHave(text("Банк отказал в проведении операции"),
                 Duration.ofSeconds(13)).shouldBe(visible);
     }
 
-    public static void wrongFormatMessage(int index) {
+    public void wrongFormatMessage(int index) {
         wrongFormatMessage.get(index).shouldHave(text("Неверный формат"),
                 Duration.ofSeconds(10)).shouldBe(visible);
     }
 
-    public static void wrongValidityPeriodMessage(int index) {
+    public void wrongValidityPeriodMessage(int index) {
         wrongFormatMessage.get(index).shouldHave(text("Неверно указан срок действия карты"),
                 Duration.ofSeconds(10)).shouldBe(visible);
     }
 
-    public static void expiredValidityPeriodMessage(int index) {
+    public void expiredValidityPeriodMessage(int index) {
         wrongFormatMessage.get(index).shouldHave(text("Истёк срок действия карты"),
                 Duration.ofSeconds(10)).shouldBe(visible);
     }
 
-    public static void isEmptyFieldMessage(int index) {
+    public void isEmptyFieldMessage(int index) {
         wrongFormatMessage.get(index).shouldHave(text("Поле обязательно для заполнения"),
                 Duration.ofSeconds(10)).shouldBe(visible);
     }
 
-    public static void invalidMessage(int index) {
+    public void invalidMessage(int index) {
         invalidField.get(index).shouldBe(exist);
 
     }
 
-    public static void emptyFieldToFill(int index) {
+    public void emptyFieldToFill(int index) {
         fieldToFill.get(index).shouldBe(empty);
 
     }
 
-    public static void lengthFieldToFill(int index, String text) {
-        fieldToFill.get(index).shouldHave(value(text));
-
-    }
-
-    public static void cardPayment(DataHelper.CardInfo cardInfo) {
+    public void cardPayment(DataHelper.CardInfo cardInfo) {
         cardNumberField.setValue(cardInfo.getNumber());
         yearField.setValue(cardInfo.getYear());
         monthField.setValue(cardInfo.getMonth());

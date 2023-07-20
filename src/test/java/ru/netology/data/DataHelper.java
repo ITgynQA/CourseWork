@@ -14,6 +14,7 @@ public class DataHelper {
         return new Faker(new Locale(locale));
     }
 
+
     @Value
     public static class CardInfo {
         String number;
@@ -43,13 +44,13 @@ public class DataHelper {
     }
 
     public static CardNumber getInvalidCardNumber() {
-        return new CardNumber(generateValue("ru")
-                .numerify("#### #### #### ####"));
+        return new CardNumber("@@@@ #### $$$$ &&&&");
     }
 
     public static CardNumber getWrongFormatCard(String value) {
         return new CardNumber(value);
     }
+
 
     @Value
     public static class Month {
@@ -98,6 +99,10 @@ public class DataHelper {
 
     public static Holder getHolder() {
         return new Holder(generateName("en"));
+    }
+
+    public static Holder getInvalidHolder() {
+        return new Holder("$$$$$$");
     }
 
     public static Holder getWrongFormatHolder(String value) {

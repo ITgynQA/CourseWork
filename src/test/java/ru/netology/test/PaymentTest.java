@@ -16,6 +16,9 @@ import static ru.netology.data.DataHelper.*;
 
 
 public class PaymentTest {
+    StartPage startPage;
+    PaymentPage paymentPage;
+
     @BeforeAll
     static void setUpAll() {
         SelenideLogger.addListener("allure", new AllureSelenide());
@@ -25,9 +28,8 @@ public class PaymentTest {
     public void setup() {
         open("http://localhost:8080");
         int index = 0;
-        StartPage StartPage;
-        StartPage = new StartPage();
-        StartPage.selectButton(index);
+        startPage = new StartPage();
+        paymentPage = startPage.selectButton(index);
 
     }
 
@@ -38,342 +40,326 @@ public class PaymentTest {
 
     @Test
     public void approvedCardTransactionTest1() {
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.successMessage();
+        paymentPage.cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0), getHolder(), getCvc()));
+        paymentPage.successMessage();
         assertEquals("APPROVED", DBHelper.getStatusPayment());
 
     }
 
     @Test
     public void declinedCardTransactionTest2() {
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getDeclinedCardNumber(), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.errorMessage();
+        paymentPage.errorMessage();
         assertEquals("DECLINED", DBHelper.getStatusPayment());
 
     }
 
     @Test
     public void invalidCardTransactionTest3() {
-        PaymentPage
-                .cardPayment(getCardInfo(getInvalidCardNumber(), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.errorMessage();
+        paymentPage
+                .cardPayment(getCardInfo(getWrongFormatCard(generateValue("ru").numerify("#### #### #### ####")),
+                        getYear(0), getMonth(0), getHolder(), getCvc()));
+        paymentPage.errorMessage();
 
     }
 
     @Test
     public void sendingFormWith15numbersInCardNumberFieldTest4() {
-        var value = "1111 2222 3333 444";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getWrongFormatCard(value), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage
+                .cardPayment(getCardInfo(getWrongFormatCard(generateValue("ru").numerify("#### #### #### ###")),
+                        getYear(0), getMonth(0), getHolder(), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWith17numbersInCardNumberFieldTest5() {
-        String value = "1111 2222 3333 4444 5";
-        String text = "1111 2222 3333 4444";
-        int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getWrongFormatCard(value), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.lengthFieldToFill(index, text);
-
+        paymentPage
+                .cardPayment(getCardInfo(getWrongFormatCard(generateValue("ru").numerify("#### #### #### #### #")),
+                        getYear(0), getMonth(0), getHolder(), getCvc()));
+        paymentPage.errorMessage();
     }
 
     @Test
     public void sendingFormWithTextInCardNumberFieldTest6() {
-        String value = "Ivan";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getWrongFormatCard(value), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.emptyFieldToFill(index);
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage
+                .cardPayment(getCardInfo(getWrongFormatCard(generateName("en")), getYear(0), getMonth(0),
+                        getHolder(), getCvc()));
+        paymentPage.emptyFieldToFill(index);
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithSpecialCharactersInCardNumberFieldTest7() {
-        String value = "@#$%&";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getWrongFormatCard(value), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.emptyFieldToFill(index);
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage
+                .cardPayment(getCardInfo(getInvalidCardNumber(), getYear(0), getMonth(0),
+                        getHolder(), getCvc()));
+        paymentPage.emptyFieldToFill(index);
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
     }
 
     @Test
     public void sendingFormIsEmptyCardNumberFieldTest8() {
-        String value = "";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getWrongFormatCard(value), getYear(0), getMonth(0), getHolder(), getCvc()));
-        PaymentPage.emptyFieldToFill(index);
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage
+                .cardPayment(getCardInfo(getWrongFormatCard(generateValue("ru").numerify("")),
+                        getYear(0), getMonth(0), getHolder(), getCvc()));
+        paymentPage.emptyFieldToFill(index);
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
     }
 
     @Test
     public void sendingFormWithNonExistentValueInMonthFieldTest9() {
-        String value = "13";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getWrongFormatMonth(value),
+        paymentPage
+                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getWrongFormatMonth("13"),
                         getHolder(), getCvc()));
-        PaymentPage.wrongValidityPeriodMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.wrongValidityPeriodMessage(index);
+        paymentPage.invalidMessage(index);
 
 
     }
 
     @Test
     public void sendingFormWithZerosInMonthFieldTest10() {
-        String value = "00";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getWrongFormatMonth(value),
+        paymentPage
+                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(1), getWrongFormatMonth("00"),
                         getHolder(), getCvc()));
-        PaymentPage.wrongValidityPeriodMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.wrongValidityPeriodMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithMeaningFromPastInMonthFieldTest11() {
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0),
                         getMonth(-1), getHolder(), getCvc()));
-        PaymentPage.wrongValidityPeriodMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.wrongValidityPeriodMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithOneDigitInMonthFieldTest12() {
-        String value = "1";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getWrongFormatMonth(value),
-                        getHolder(), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage
+                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0),
+                        getWrongFormatMonth(generateValue("ru").numerify("#")), getHolder(), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormIsEmptyMonthFieldTest13() {
-        String value = "";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getWrongFormatMonth(value),
+        paymentPage
+                .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0),
+                        getWrongFormatMonth(generateValue("ru").numerify("")),
                         getHolder(), getCvc()));
-        PaymentPage.emptyFieldToFill(1);
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.emptyFieldToFill(1);
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
     }
 
     @Test
     public void sendingFormWithMeaningFromPastInYearFieldTest14() {
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(-1), getMonth(0),
                         getHolder(), getCvc()));
-        PaymentPage.expiredValidityPeriodMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.expiredValidityPeriodMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithMeaningFromFutureInYearFieldTest15() {
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(6), getMonth(0),
                         getHolder(), getCvc()));
-        PaymentPage.wrongValidityPeriodMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.wrongValidityPeriodMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithOneDigitInYearFieldTest16() {
-        String value = "1";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getWrongFormatYear(value), getMonth(0),
+        paymentPage
+                .cardPayment(getCardInfo(getApprovedCardNumber(), getWrongFormatYear(generateValue("ru")
+                                .numerify("#")), getMonth(0),
                         getHolder(), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormIsEmptyYearFieldTest17() {
-        String value = "";
         int index = 0;
-        PaymentPage
-                .cardPayment(getCardInfo(getApprovedCardNumber(), getWrongFormatYear(value), getMonth(0),
+        paymentPage
+                .cardPayment(getCardInfo(getApprovedCardNumber(), getWrongFormatYear(generateValue("ru")
+                                .numerify("")), getMonth(0),
                         getHolder(), getCvc()));
-        PaymentPage.emptyFieldToFill(2);
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+        paymentPage.emptyFieldToFill(2);
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithNumbersInHolderFieldTest18() {
-        String value = "123";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getWrongFormatHolder(value), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getWrongFormatHolder(generateValue("ru").numerify("#####")), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithCyrillicInHolderFieldTest19() {
-        String value = "Иванов";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getWrongFormatHolder(value), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getWrongFormatHolder(generateName("ru")), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithOneLetterInHolderFieldTest20() {
-        String value = "J";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getWrongFormatHolder(value), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getWrongFormatHolder(generateValue("en").letterify("?")), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithOneHundredThirtyLettersInHolderFieldTest21() {
-        String value = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" +
-                "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getWrongFormatHolder(value), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getWrongFormatHolder(generateValue("en").
+                                letterify("???????????????????????????????????????????????????????????????????" +
+                                        "???????????????????????????????????????????????????????????")), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithSpecialCharactersInHolderFieldTest22() {
-        String value = "@#$%&";
         int index = 0;
-        PaymentPage.cardPayment
+        paymentPage.cardPayment
                 (getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getWrongFormatHolder(value), getCvc()));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getInvalidHolder(), getCvc()));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormIsEmptyHolderFieldTest23() {
-        String value = "";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getWrongFormatHolder(value), getCvc()));
-        PaymentPage.emptyFieldToFill(3);
-        PaymentPage.isEmptyFieldMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getWrongFormatHolder(generateValue("ru").numerify("")), getCvc()));
+        paymentPage.emptyFieldToFill(3);
+        paymentPage.isEmptyFieldMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithTextInCvcFieldTest24() {
-        String value = "Ivan";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getHolder(), getWrongFormatCvc(value)));
-        PaymentPage.emptyFieldToFill(4);
-        PaymentPage.invalidMessage(index);
+                        getHolder(), getWrongFormatCvc(generateValue("en").letterify("???"))));
+        paymentPage.emptyFieldToFill(4);
+        paymentPage.invalidMessage(index);
     }
 
     @Test
     public void sendingFormWithTwoNumbersInCvcFieldTest25() {
-        String value = "99";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getHolder(), getWrongFormatCvc(value)));
-        PaymentPage.wrongFormatMessage(index);
-        PaymentPage.invalidMessage(index);
+                        getHolder(), getWrongFormatCvc(generateValue("ru").numerify("##"))));
+        paymentPage.wrongFormatMessage(index);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormWithFourNumbersInCvcFieldTest26() {
-        String value = "9999";
-        String text = "999";
-        int index = 4;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getHolder(), getWrongFormatCvc(value)));
-        PaymentPage.lengthFieldToFill(index, text);
+                        getHolder(), getWrongFormatCvc(generateValue("ru").numerify("####"))));
+        paymentPage.successMessage();
 
     }
 
     @Test
     public void sendingFormWithSpecialCharactersInCvcFieldTest27() {
-        String value = "@#$";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getHolder(), getWrongFormatCvc(value)));
-        PaymentPage.emptyFieldToFill(4);
-        PaymentPage.invalidMessage(index);
+                        getHolder(), getWrongFormatCvc(generateValue("en").letterify("???"))));
+        paymentPage.emptyFieldToFill(4);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormIsEmptyCvcFieldTest28() {
-        String value = "";
         int index = 0;
-        PaymentPage
+        paymentPage
                 .cardPayment(getCardInfo(getApprovedCardNumber(), getYear(0), getMonth(0),
-                        getHolder(), getWrongFormatCvc(value)));
-        PaymentPage.emptyFieldToFill(4);
-        PaymentPage.invalidMessage(index);
+                        getHolder(), getWrongFormatCvc(generateValue("ru").numerify(""))));
+        paymentPage.emptyFieldToFill(4);
+        paymentPage.invalidMessage(index);
 
     }
 
     @Test
     public void sendingFormIsEmptyAllFieldsTest29() {
-        String value = "";
-        PaymentPage
-                .cardPayment(getCardInfo(getWrongFormatCard(value), getWrongFormatYear(value), getWrongFormatMonth(value),
-                        getWrongFormatHolder(value), getWrongFormatCvc(value)));
-        PaymentPage.wrongFormatMessage(0);
-        PaymentPage.wrongFormatMessage(1);
-        PaymentPage.wrongFormatMessage(2);
-        PaymentPage.isEmptyFieldMessage(3);
-        PaymentPage.wrongFormatMessage(4);
-        PaymentPage.invalidMessage(0);
-        PaymentPage.invalidMessage(1);
-        PaymentPage.invalidMessage(2);
-        PaymentPage.invalidMessage(3);
-        PaymentPage.invalidMessage(4);
+        paymentPage
+                .cardPayment(getCardInfo(getWrongFormatCard(generateValue("ru").numerify("")),
+                        getWrongFormatYear(generateValue("ru").numerify("")),
+                        getWrongFormatMonth(generateValue("ru").numerify("")),
+                        getWrongFormatHolder(generateValue("ru").numerify("")),
+                        getWrongFormatCvc(generateValue("ru").numerify(""))));
+        paymentPage.wrongFormatMessage(0);
+        paymentPage.wrongFormatMessage(1);
+        paymentPage.wrongFormatMessage(2);
+        paymentPage.isEmptyFieldMessage(3);
+        paymentPage.wrongFormatMessage(4);
+        paymentPage.invalidMessage(0);
+        paymentPage.invalidMessage(1);
+        paymentPage.invalidMessage(2);
+        paymentPage.invalidMessage(3);
+        paymentPage.invalidMessage(4);
 
     }
 }
