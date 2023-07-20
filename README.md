@@ -21,9 +21,9 @@
 * API-тесты.
 * Репорты — Allure.
 
-3.Отчет по итогам тестирования. [Report.md]()
+3.Отчет по итогам тестирования. [Report.md](https://github.com/ITgynQA/CourseWork/blob/main/docs/Report.md)
 
-4.Отчет по итогам автоматизации. [Summary.md]()
+4.Отчет по итогам автоматизации. [Summary.md](https://github.com/ITgynQA/CourseWork/blob/main/docs/Summary.md)
 
 
 ### Начало работы
